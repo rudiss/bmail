@@ -6,7 +6,12 @@ import { Email } from '@/types/email'
 
 // Mock the EmailItem component since we'll test it separately
 jest.mock('../EmailItem', () => {
-  return function MockEmailItem({ email, onEmailSelect, onToggleStar, activeFolder }: any) {
+  return function MockEmailItem({ email, onEmailSelect, onToggleStar, activeFolder }: {
+    email: Email;
+    onEmailSelect: (emailId: string) => void;
+    onToggleStar: (emailId: string, event?: React.MouseEvent) => void;
+    activeFolder: string;
+  }) {
     return (
       <div data-testid={`email-item-${email.id}`}>
         <span data-testid="sender">{email.sender}</span>
