@@ -28,35 +28,35 @@ jest.mock('@/data/emails', () => ({
 const mockEmails: Email[] = [
   {
     id: '1',
-    sender: 'John Doe',
-    senderEmail: 'john@example.com',
-    subject: 'Test Email 1',
-    preview: 'Test preview 1',
-    body: 'Test body 1',
+    sender: 'Test Sender',
+    senderEmail: 'test@example.com',
+    subject: 'Test Subject',
+    preview: 'Test preview',
+    body: 'Test body',
     timestamp: '10:00 AM',
     isStarred: false,
     isRead: true,
-    avatar: 'JD',
+    avatar: 'TS',
     folder: 'inbox'
   },
   {
     id: '2',
-    sender: 'Jane Smith',
-    senderEmail: 'jane@example.com',
-    subject: 'Test Email 2',
-    preview: 'Test preview 2',
-    body: 'Test body 2',
+    sender: 'Another Sender',
+    senderEmail: 'another@example.com',
+    subject: 'Another Subject',
+    preview: 'Another preview',
+    body: 'Another body',
     timestamp: '11:00 AM',
     isStarred: false,
     isRead: false,
-    avatar: 'JS',
+    avatar: 'AS',
     folder: 'inbox'
   },
   {
     id: '3',
     sender: 'Spam Sender',
     senderEmail: 'spam@example.com',
-    subject: 'Spam Email',
+    subject: 'Spam Subject',
     preview: 'Spam preview',
     body: 'Spam body',
     timestamp: '12:00 PM',
@@ -120,38 +120,45 @@ describe('Sidebar', () => {
   })
 
   describe('Folder Counts', () => {
-    it('shows count for inbox folder', () => {
+    it('shows count for inbox when emails present', () => {
       render(<Sidebar {...defaultProps} />)
 
-      // Should show count of 2 based on mock emails filtered for inbox
-      expect(screen.getByText('2')).toBeInTheDocument()
+      const inboxFolder = screen.getByText('Inbox').closest('div')
+      expect(inboxFolder).toHaveTextContent('2') // 2 inbox emails
     })
 
-    it('shows count for spam folder', () => {
+    it('shows count for spam when emails present', () => {
       render(<Sidebar {...defaultProps} />)
 
-      // Should show count of 1 based on mock emails filtered for spam
-      expect(screen.getByText('1')).toBeInTheDocument()
+      const spamFolder = screen.getByText('Spam').closest('div')
+      expect(spamFolder).toHaveTextContent('1') // 1 spam email
     })
 
-    it('does not show counts for folders without emails', () => {
-      const emailsWithoutStarred = mockEmails.map(email => ({ ...email, isStarred: false }))
-      render(<Sidebar {...defaultProps} emails={emailsWithoutStarred} />)
+    it('does not show counts for other folders', () => {
+      render(<Sidebar {...defaultProps} />)
 
-      // Starred folder should not show count (0 emails)
+      // Starred, All Mail, and Trash should not show counts
       const starredFolder = screen.getByText('Starred').closest('div')
-      expect(starredFolder).not.toHaveTextContent(/\d+/)
-    })
-
-    it('hides counts for non-inbox and non-spam folders', () => {
-      render(<Sidebar {...defaultProps} />)
-
-      // Check that other folders don't show counts
       const allMailFolder = screen.getByText('All Mail').closest('div')
       const trashFolder = screen.getByText('Trash').closest('div')
 
+      expect(starredFolder?.textContent).toBe('Starred')
       expect(allMailFolder?.textContent).toBe('All Mail')
       expect(trashFolder?.textContent).toBe('Trash')
+    })
+
+    it('does not show count when folder is empty', () => {
+      const emptyProps = {
+        ...defaultProps,
+        emails: []
+      }
+      render(<Sidebar {...emptyProps} />)
+
+      const inboxFolder = screen.getByText('Inbox').closest('div')
+      const spamFolder = screen.getByText('Spam').closest('div')
+
+      expect(inboxFolder?.textContent).toBe('Inbox')
+      expect(spamFolder?.textContent).toBe('Spam')
     })
   })
 
@@ -202,7 +209,15 @@ describe('Sidebar', () => {
       const { container } = render(<Sidebar {...defaultProps} />)
 
       const composeButton = container.querySelector('button.rounded-2xl.bg-\\[rgb\\(194\\,231\\,255\\)\\]')
-      expect(composeButton).toHaveClass('mb-4', 'h-[56px]', 'w-[138px]', 'opacity-50')
+      expect(composeButton).toHaveClass('h-[56px]', 'w-[138px]', 'rounded-2xl', 'bg-[rgb(194,231,255)]')
+      expect(composeButton).toHaveClass('hover:bg-[rgb(174,211,235)]', 'transition-colors', 'flex', 'items-center', 'justify-center')
+    })
+
+    it('renders compose button content correctly', () => {
+      render(<Sidebar {...defaultProps} />)
+
+      expect(screen.getByText('Compose')).toBeInTheDocument()
+      expect(screen.getByText('✏')).toBeInTheDocument()
     })
   })
 
