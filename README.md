@@ -302,14 +302,6 @@ const nextConfig = {
 - ✅ Edge 90+
 - ✅ Mobile browsers (iOS Safari, Chrome Mobile)
 
-## 🤝 **Contributing**
-
-### **Development Workflow**
-1. Fork the repository
-2. Create a feature branch
-3. Write tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
 
 ### **Code Standards**
 - **TypeScript**: Strict type checking
@@ -317,19 +309,9 @@ const nextConfig = {
 - **Prettier**: Code formatting
 - **Testing**: Minimum 80% coverage required
 
-## 📄 **License**
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 **Acknowledgments**
-
-- **Next.js Team** - Amazing React framework
-- **Vercel** - Excellent deployment platform
-- **Tailwind CSS** - Utility-first CSS framework
-- **React Team** - Concurrent features and optimizations
 
 ---
 
-**Built with ❤️ by [Your Name]**
 
-*BMail - The future of email clients is here!*
