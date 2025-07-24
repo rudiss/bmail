@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import EmailItem from './EmailItem';
 import { Email } from '@/types/email';
 
@@ -10,30 +10,46 @@ interface EmailListProps {
   activeFolder: string;
 }
 
-const EmailList: React.FC<EmailListProps> = ({
+// Memoize folder display names to avoid recalculation
+const FOLDER_NAMES: { [key: string]: string } = {
+  'inbox': 'Inbox',
+  'starred': 'Starred',
+  'all-mail': 'All Mail',
+  'spam': 'Spam',
+  'trash': 'Trash'
+};
+
+const EmailList: React.FC<EmailListProps> = memo(({
   emails,
   selectedEmailId,
   onEmailSelect,
   onToggleStar,
   activeFolder
 }) => {
-  const getFolderDisplayName = (folderId: string) => {
-    const folderNames: { [key: string]: string } = {
-      'inbox': 'Inbox',
-      'starred': 'Starred',
-      'all-mail': 'All Mail',
-      'spam': 'Spam',
-      'trash': 'Trash'
-    };
-    return folderNames[folderId] || 'Inbox';
-  };
+  // Memoize folder display name
+  const folderDisplayName = useMemo(() => {
+    return FOLDER_NAMES[activeFolder] || 'Inbox';
+  }, [activeFolder]);
 
-  if (emails.length === 0) {
+  // Memoize empty state check
+  const isEmpty = useMemo(() => emails.length === 0, [emails.length]);
+
+  // Memoize event handlers to prevent child re-renders
+  const memoizedOnEmailSelect = useCallback((emailId: string) => {
+    onEmailSelect(emailId);
+  }, [onEmailSelect]);
+
+  const memoizedOnToggleStar = useCallback((emailId: string, event?: React.MouseEvent) => {
+    onToggleStar(emailId, event);
+  }, [onToggleStar]);
+
+  // Early return for empty state
+  if (isEmpty) {
     return (
       <div className="mr-[56px] mb-4 flex min-w-[500px] grow flex-col rounded-2xl bg-white">
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center text-gray-500">
-            <div className="text-lg mb-2">No emails in {getFolderDisplayName(activeFolder)}</div>
+            <div className="text-lg mb-2">No emails in {folderDisplayName}</div>
             <div className="text-sm">This folder is empty.</div>
           </div>
         </div>
@@ -51,8 +67,8 @@ const EmailList: React.FC<EmailListProps> = ({
               key={email.id}
               email={email}
               selectedEmailId={selectedEmailId}
-              onEmailSelect={onEmailSelect}
-              onToggleStar={onToggleStar}
+              onEmailSelect={memoizedOnEmailSelect}
+              onToggleStar={memoizedOnToggleStar}
               activeFolder={activeFolder}
             />
           ))}
@@ -60,6 +76,9 @@ const EmailList: React.FC<EmailListProps> = ({
       </div>
     </div>
   );
-};
+});
+
+// Set display name for debugging
+EmailList.displayName = 'EmailList';
 
 export default EmailList; 

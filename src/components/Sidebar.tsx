@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 import { folders, getEmailsForFolder } from '@/data/emails';
 import { Folder, Email } from '@/types/email';
@@ -9,17 +9,19 @@ interface SidebarProps {
   emails: Email[];
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ activeFolder, onFolderSelect, emails }) => {
-  const getIconForFolder = (folderId: string) => {
-    const iconMap: { [key: string]: string } = {
-      'inbox': '/icon-inbox.webp',
-      'starred': '/icon-star.webp',
-      'all-mail': '/icon-all-mail.webp',
-      'spam': '/icon-spam.webp',
-      'trash': '/icon-trash.webp'
-    };
+// Pre-compute icon mapping to avoid recreation
+const ICON_MAP: { [key: string]: string } = {
+  'inbox': '/icon-inbox.webp',
+  'starred': '/icon-star.webp',
+  'all-mail': '/icon-all-mail.webp',
+  'spam': '/icon-spam.webp',
+  'trash': '/icon-trash.webp'
+};
 
-    const iconSrc = iconMap[folderId];
+const Sidebar: React.FC<SidebarProps> = memo(({ activeFolder, onFolderSelect, emails }) => {
+  // Memoize the getIconForFolder function
+  const getIconForFolder = useCallback((folderId: string) => {
+    const iconSrc = ICON_MAP[folderId];
     if (!iconSrc) return <div className="h-5 w-5 bg-gray-300 rounded"></div>;
 
     return (
@@ -30,26 +32,34 @@ const Sidebar: React.FC<SidebarProps> = ({ activeFolder, onFolderSelect, emails 
         height={20}
         className="h-5 w-5"
         style={{ color: 'transparent' }}
+        loading="lazy" // Add lazy loading for performance
       />
     );
-  };
+  }, []);
 
-  // Calculate dynamic counts only for inbox and spam folders
-  const getFolderCount = (folderId: string) => {
-    // Only show counts for inbox and spam
-    if (folderId !== 'inbox' && folderId !== 'spam') {
-      return undefined;
-    }
+  // Memoize folder counts calculation (only for inbox and spam)
+  const folderCounts = useMemo(() => {
+    const counts: { [key: string]: number | undefined } = {};
 
-    const emailsInFolder = getEmailsForFolder(folderId, emails);
-    const count = emailsInFolder.length;
-    return count > 0 ? count : undefined;
-  };
+    ['inbox', 'spam'].forEach(folderId => {
+      const emailsInFolder = getEmailsForFolder(folderId, emails);
+      const count = emailsInFolder.length;
+      counts[folderId] = count > 0 ? count : undefined;
+    });
 
-  const handleCompose = () => {
+    return counts;
+  }, [emails]);
+
+  // Memoize the compose handler
+  const handleCompose = useCallback(() => {
     // TODO: Implement compose email functionality
     console.log('Compose email clicked');
-  };
+  }, []);
+
+  // Memoize folder select handler
+  const handleFolderSelect = useCallback((folderId: string) => () => {
+    onFolderSelect(folderId);
+  }, [onFolderSelect]);
 
   return (
     <div className="w-[256px] shrink-0 px-3 text-sm">
@@ -57,23 +67,27 @@ const Sidebar: React.FC<SidebarProps> = ({ activeFolder, onFolderSelect, emails 
       <div className="mb-4">
         <button
           onClick={handleCompose}
-          className="mb-4 h-[56px] w-[138px] rounded-2xl bg-[rgb(194,231,255)] opacity-50"
+          className="h-[56px] w-[138px] rounded-2xl bg-[rgb(194,231,255)] hover:bg-[rgb(174,211,235)] transition-colors flex items-center justify-center gap-3 px-6 shadow-sm"
         >
-
+          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+            <span className="text-white text-sm font-bold">✏</span>
+          </div>
+          <span className="text-gray-700 font-medium">Compose</span>
         </button>
       </div>
 
       {/* Navigation Items */}
       {folders.map((folder: Folder) => {
-        const dynamicCount = getFolderCount(folder.id);
+        const dynamicCount = folderCounts[folder.id];
+        const isActive = activeFolder === folder.id;
 
         return (
           <div
             key={folder.id}
-            onClick={() => onFolderSelect(folder.id)}
-            className={`flex cursor-pointer items-center gap-4 rounded-full py-1.5 pr-3 pl-4 ${activeFolder === folder.id
-              ? 'bg-[rgb(211,227,253)] font-semibold text-[rgb(32,33,36)]'
-              : 'hover:bg-[oklch(0.928_0.006_264.531)]'
+            onClick={handleFolderSelect(folder.id)}
+            className={`flex cursor-pointer items-center gap-4 rounded-full py-1.5 pr-3 pl-4 ${isActive
+                ? 'bg-[rgb(211,227,253)] font-semibold text-[rgb(32,33,36)]'
+                : 'hover:bg-[oklch(0.928_0.006_264.531)]'
               }`}
           >
             {getIconForFolder(folder.id)}
@@ -86,6 +100,9 @@ const Sidebar: React.FC<SidebarProps> = ({ activeFolder, onFolderSelect, emails 
       })}
     </div>
   );
-};
+});
+
+// Set display name for debugging
+Sidebar.displayName = 'Sidebar';
 
 export default Sidebar; 

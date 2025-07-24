@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useCallback, useMemo, startTransition } from 'react';
 import Image from 'next/image';
 import Sidebar from '@/components/Sidebar';
 import EmailList from '@/components/EmailList';
@@ -16,35 +16,49 @@ export default function Home() {
   // Use the email actions hook
   const emailActions = useEmailActions(initialEmails);
 
-  // Filter emails based on active folder
-  const filteredEmails = getEmailsForFolder(activeFolder, emailActions.emails);
+  // Memoize expensive email filtering computation
+  const filteredEmails = useMemo(() => {
+    return getEmailsForFolder(activeFolder, emailActions.emails);
+  }, [activeFolder, emailActions.emails]);
 
-  const selectedEmail = selectedEmailId
-    ? emailActions.emails.find((email: Email) => email.id === selectedEmailId)
-    : null;
+  // Memoize selected email lookup
+  const selectedEmail = useMemo(() => {
+    return selectedEmailId
+      ? emailActions.emails.find((email: Email) => email.id === selectedEmailId) || null
+      : null;
+  }, [selectedEmailId, emailActions.emails]);
 
-  const handleEmailSelect = (emailId: string) => {
-    setSelectedEmailId(emailId);
-    // Mark email as read when opened
+  // Memoize event handlers to prevent child component re-renders
+  const handleEmailSelect = useCallback((emailId: string) => {
+    // Use startTransition for non-urgent updates
+    startTransition(() => {
+      setSelectedEmailId(emailId);
+    });
+    // Mark email as read when opened (this is urgent)
     emailActions.markAsRead(emailId);
-  };
+  }, [emailActions]);
 
-  const handleBackToList = () => {
-    setSelectedEmailId(null);
-  };
+  const handleBackToList = useCallback(() => {
+    startTransition(() => {
+      setSelectedEmailId(null);
+    });
+  }, []);
 
-  const handleFolderSelect = (folderId: string) => {
-    setActiveFolder(folderId);
-    setSelectedEmailId(null); // Clear selection when switching folders
-  };
+  const handleFolderSelect = useCallback((folderId: string) => {
+    // Use startTransition for folder switching
+    startTransition(() => {
+      setActiveFolder(folderId);
+      setSelectedEmailId(null); // Clear selection when switching folders
+    });
+  }, []);
 
-  const handleToggleStar = (emailId: string, event?: React.MouseEvent) => {
+  const handleToggleStar = useCallback((emailId: string, event?: React.MouseEvent) => {
     // Prevent email selection when clicking star
     if (event) {
       event.stopPropagation();
     }
     emailActions.toggleStar(emailId);
-  };
+  }, [emailActions]);
 
   return (
     <div className="flex min-h-screen grow flex-col bg-[rgb(248,250,253)]">
@@ -64,6 +78,8 @@ export default function Home() {
               height: '40px'
             }}
             priority
+            placeholder="blur"
+            blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8A0XqFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFUooooooooooooooop//Z"
           />
         </div>
       </div>

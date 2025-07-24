@@ -2,156 +2,136 @@ import { Email, Folder } from '@/types/email';
 
 export const folders: Folder[] = [
   { id: 'inbox', name: 'Inbox', count: 7, icon: '📥' },
-  { id: 'starred', name: 'Starred', count: 0, icon: '⭐' },
-  { id: 'all-mail', name: 'All Mail', count: 0, icon: '📧' },
-  { id: 'spam', name: 'Spam', count: 0, icon: '⚠️' },
+  { id: 'starred', name: 'Starred', count: 2, icon: '⭐' },
+  { id: 'all-mail', name: 'All Mail', count: 8, icon: '📧' },
+  { id: 'spam', name: 'Spam', count: 1, icon: '⚠️' },
   { id: 'trash', name: 'Trash', count: 1, icon: '🗑️' },
 ];
 
 export const initialEmails: Email[] = [
   {
     id: '1',
-    sender: 'BMail Team',
-    senderEmail: 'noreply@bmail.com',
-    subject: 'Welcome to BMail',
-    preview: 'Welcome to BMail! Your account is all set up and ready to go. Start exploring our features.',
-    body: 'Welcome to BMail! Your account is all set up and ready to go. Start exploring our features.',
-    timestamp: '9:15 AM',
+    sender: 'LinkedIn Writer',
+    senderEmail: 'writer@linkedin.com',
+    subject: 'Your guide to making the perfect LinkedIn post',
+    preview: 'Stand out and be heard with these expert tips.',
+    body: 'Here are some expert tips on how to craft the perfect LinkedIn post that will help you stand out in your network and get your message heard by the right people.',
+    timestamp: 'Mar 12',
+    isStarred: false,
+    isRead: false,
+    avatar: 'LW',
+    folder: 'inbox'
+  },
+  {
+    id: '2',
+    sender: 'Duolingo Korean',
+    senderEmail: 'duolingo@duolingo.com',
+    subject: '🔥 Stretch your streak to 7 days',
+    preview: 'Your streak is on the line: finish this lesson and unlock a new achievement',
+    body: 'Your Korean learning streak is heating up! Don\'t let it cool down - complete today\'s lesson to keep your 6-day streak alive and unlock new achievements.',
+    timestamp: 'Mar 12',
     isStarred: true,
+    isRead: false,
+    avatar: 'DK',
+    folder: 'inbox'
+  },
+  {
+    id: '3',
+    sender: 'Better Team',
+    senderEmail: 'team@better.com',
+    subject: 'Your home-buying checklist',
+    preview: '6 essential steps for every home buyer',
+    body: 'Buying a home can be overwhelming, but with the right checklist, you can navigate the process with confidence. Here are 6 essential steps every home buyer should follow.',
+    timestamp: 'Mar 12',
+    isStarred: false,
     isRead: true,
     avatar: 'BT',
     folder: 'inbox'
   },
   {
-    id: '2',
-    sender: 'David Kim, Lisa Wang',
-    senderEmail: 'david.kim@company.com',
-    subject: 'Re: Project deadline reminder',
-    preview: 'Thanks Lisa! I\'ll have my section ready by Thursday afternoon.',
-    body: 'Thanks Lisa! I\'ll have my section ready by Thursday afternoon.',
-    timestamp: 'Mar 13',
-    isStarred: false,
-    isRead: false,
-    avatar: 'DK',
-    folder: 'inbox',
-    thread: [
-      {
-        id: '2-1',
-        sender: 'Lisa Wang',
-        senderEmail: 'lisa.wang@company.com',
-        content: 'Hi team, just a reminder that our project deadline is this Friday. Please submit your final reports.',
-        timestamp: 'Wed, Mar 13, 2:30 PM (24 hours ago)',
-        avatar: 'LW',
-        recipients: 'to you, David Kim'
-      },
-      {
-        id: '2-2',
-        sender: 'David Kim',
-        senderEmail: 'david.kim@company.com',
-        content: 'Thanks Lisa! I\'ll have my section ready by Thursday afternoon.',
-        timestamp: 'Wed, Mar 13, 4:20 PM (22 hours ago)',
-        avatar: 'DK',
-        recipients: 'to Lisa Wang, you'
-      }
-    ]
-  },
-  {
-    id: '3',
-    sender: 'Local Library',
-    senderEmail: 'newsletter@locallibrary.org',
-    subject: 'Monthly newsletter',
-    preview: 'Check out our new arrivals and upcoming events this month at your local library.',
-    body: 'Check out our new arrivals and upcoming events this month at your local library.',
-    timestamp: 'Mar 13',
+    id: '4',
+    sender: 'Lulu Lemon',
+    senderEmail: 'offers@lululemon.com',
+    subject: 'Back in stock: your wishlist items',
+    preview: 'Your favorites are waiting for you',
+    body: 'Great news! Some of your wishlist items are back in stock and ready to ship. Don\'t wait too long - popular items tend to sell out quickly.',
+    timestamp: 'Mar 12',
     isStarred: false,
     isRead: true,
     avatar: 'LL',
     folder: 'inbox'
   },
   {
-    id: '4',
-    sender: 'Deals4U',
-    senderEmail: 'no-reply@deals4u.biz',
-    subject: 'Free iPhone 15 - Act Now!',
-    preview: 'You\'ve been selected to receive a FREE iPhone 15! Just pay shipping. Limited time offer!!!',
-    body: 'You\'ve been selected to receive a FREE iPhone 15! Just pay shipping. Limited time offer!!!',
-    timestamp: 'Mar 12',
-    isStarred: false,
-    isRead: false,
-    avatar: 'D4',
-    folder: 'spam'
-  },
-  {
     id: '5',
-    sender: 'StreamingService',
-    senderEmail: 'account@streamingservice.com',
-    subject: 'Your subscription is expiring',
-    preview: 'Your monthly subscription will expire in 3 days. Renew now to continue enjoying our content.',
-    body: 'Your monthly subscription will expire in 3 days. Renew now to continue enjoying our content.',
-    timestamp: 'Mar 12',
+    sender: 'Design 4 Drupal',
+    senderEmail: 'info@design4drupal.com',
+    subject: 'Register for our biggest event yet',
+    preview: 'Join the Drupal community at our annual conference',
+    body: 'Join us for the biggest Drupal event of the year! Connect with fellow developers, learn about the latest updates, and participate in hands-on workshops.',
+    timestamp: 'Mar 11',
     isStarred: false,
     isRead: true,
-    avatar: 'SS',
+    avatar: 'D4',
     folder: 'inbox'
   },
   {
     id: '6',
-    sender: 'Outdoor Club',
-    senderEmail: 'events@outdoorclub.org',
-    subject: 'Weekend hiking trip',
-    preview: 'Join us this Saturday for a scenic hike at Blue Mountain Trail. All skill levels welcome!',
-    body: 'Join us this Saturday for a scenic hike at Blue Mountain Trail. All skill levels welcome!',
-    timestamp: 'Mar 12',
+    sender: 'SkyScanner',
+    senderEmail: 'deals@skyscanner.com',
+    subject: 'Fly for less: Tokyo flights from $924',
+    preview: 'Book now and save on your next adventure',
+    body: 'Amazing flight deals to Tokyo are available now! Starting from just $924, these prices won\'t last long. Book your next adventure today and save big.',
+    timestamp: 'Mar 11',
     isStarred: true,
     isRead: false,
-    avatar: 'OC',
+    avatar: 'SS',
     folder: 'inbox'
   },
   {
     id: '7',
-    sender: 'Emma Thompson, you',
-    senderEmail: 'emma.thompson@company.com',
-    subject: 'Re: Coffee catch-up?',
-    preview: 'Absolutely! I\'d love to catch up. How about Thursday afternoon around 3 PM? There\'s a nice new cafe on 5th Street called Brew & Beans.',
-    body: 'Absolutely! I\'d love to catch up. How about Thursday afternoon around 3 PM? There\'s a nice new cafe on 5th Street called Brew & Beans.',
-    timestamp: 'Mar 12',
+    sender: 'John Qian',
+    senderEmail: 'john.qian@techcorp.com',
+    subject: 'Q1 Project Update - Please Review',
+    preview: 'Hi team, here\'s the latest update on our Q1 project milestones...',
+    body: 'Hi team, I wanted to share the latest update on our Q1 project milestones. We\'ve made significant progress and I\'d love to get your feedback.',
+    timestamp: 'Mar 10',
     isStarred: false,
     isRead: true,
-    avatar: 'ET',
+    avatar: 'JQ',
     folder: 'inbox',
     thread: [
       {
         id: '7-1',
-        sender: 'Emma Thompson',
-        senderEmail: 'emma.thompson@company.com',
-        content: 'Hey! It\'s been a while. Want to grab coffee this week and catch up?',
-        timestamp: 'Tue, Mar 12, 11:45 AM (2 days ago)',
-        avatar: 'ET',
-        recipients: 'to you'
+        sender: 'John Qian',
+        senderEmail: 'john.qian@techcorp.com',
+        content: 'Hi team, I wanted to share the latest update on our Q1 project milestones. We\'ve made significant progress and I\'d love to get your feedback on the current direction.',
+        timestamp: 'Wed, Mar 12, 2:00 PM (26 hours ago)',
+        avatar: 'JQ',
+        recipients: 'to you, Sarah, Mike'
       },
       {
         id: '7-2',
         sender: 'John Qian',
-        senderEmail: 'john@gmail.com',
-        content: 'Absolutely! I\'d love to catch up. How about Thursday afternoon around 3 PM? There\'s a nice new cafe on 5th Street called Brew & Beans.',
-        timestamp: 'Tue, Mar 12, 2:20 PM (2 days ago)',
+        senderEmail: 'john.qian@techcorp.com',
+        content: 'Also, please let me know if you have any concerns about the timeline. We want to make sure we\'re all aligned before moving forward.',
+        timestamp: 'Wed, Mar 12, 4:15 PM (24 hours ago)',
         avatar: 'JQ',
-        recipients: 'to Emma Thompson'
+        recipients: 'to you, Sarah, Mike'
       }
     ]
   },
   {
     id: '8',
-    sender: 'IT Department',
-    senderEmail: 'security@company.com',
-    subject: 'Important: Security update',
-    preview: 'Please update your password before the end of the week as part of our security policy.',
-    body: 'Please update your password before the end of the week as part of our security policy.',
-    timestamp: 'Mar 12',
+    sender: 'Office Calendar',
+    senderEmail: 'calendar@company.com',
+    subject: 'Meeting reminder: Team standup',
+    preview: 'Daily standup meeting starts in 15 minutes',
+    body: 'This is a reminder that your daily team standup meeting starts in 15 minutes. Please make sure to have your updates ready to share with the team.',
+    timestamp: 'Mar 10',
     isStarred: false,
     isRead: true,
-    avatar: 'IT',
-    folder: 'inbox'
+    avatar: 'OC',
+    folder: 'spam'
   },
   {
     id: '9',
@@ -168,20 +148,54 @@ export const initialEmails: Email[] = [
   }
 ];
 
-// Utility function to filter emails based on folder - now accepts emails array parameter
+// Cache for getEmailsForFolder results to avoid redundant filtering
+const folderCache = new Map<string, Email[]>();
+let lastEmailsHash = '';
+
+// Helper function to create a simple hash of emails array
+function createEmailsHash(emails: Email[]): string {
+  return emails.map(e => `${e.id}-${e.folder}-${e.isDeleted}-${e.isStarred}`).join('|');
+}
+
 export const getEmailsForFolder = (folderId: string, emails: Email[]): Email[] => {
+  const emailsHash = createEmailsHash(emails);
+  const cacheKey = `${folderId}-${emailsHash}`;
+
+  // Check if we have a cached result and emails haven't changed
+  if (folderCache.has(cacheKey) && lastEmailsHash === emailsHash) {
+    return folderCache.get(cacheKey)!;
+  }
+
+  // Clear cache if emails changed
+  if (lastEmailsHash !== emailsHash) {
+    folderCache.clear();
+    lastEmailsHash = emailsHash;
+  }
+
+  let result: Email[];
+
   switch (folderId) {
     case 'inbox':
-      return emails.filter(email => email.folder === 'inbox' && !email.isDeleted);
+      result = emails.filter(email => email.folder === 'inbox' && !email.isDeleted);
+      break;
     case 'starred':
-      return emails.filter(email => email.isStarred && !email.isDeleted && email.folder !== 'trash');
+      result = emails.filter(email => email.isStarred && !email.isDeleted && email.folder !== 'trash');
+      break;
     case 'all-mail':
-      return emails.filter(email => !email.isDeleted && email.folder !== 'trash');
+      result = emails.filter(email => !email.isDeleted && email.folder !== 'trash');
+      break;
     case 'spam':
-      return emails.filter(email => email.folder === 'spam');
+      result = emails.filter(email => email.folder === 'spam');
+      break;
     case 'trash':
-      return emails.filter(email => email.isDeleted || email.folder === 'trash');
+      result = emails.filter(email => email.folder === 'trash' || email.isDeleted);
+      break;
     default:
-      return emails.filter(email => email.folder === 'inbox' && !email.isDeleted);
+      result = emails.filter(email => email.folder === 'inbox' && !email.isDeleted);
   }
+
+  // Cache the result
+  folderCache.set(cacheKey, result);
+
+  return result;
 }; 
