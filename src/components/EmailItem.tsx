@@ -24,7 +24,7 @@ const EmailItem: React.FC<EmailItemProps> = memo(({
 
   // Memoize styling classes to prevent recalculation
   const containerClasses = useMemo(() => {
-    let classes = "flex items-center px-4 py-3 hover:shadow-sm cursor-pointer transition-all ";
+    let classes = "flex items-center px-4 py-2 hover:shadow-sm cursor-pointer transition-all border-b border-gray-200 ";
     if (isSelected) {
       classes += "bg-blue-50";
     } else if (!email.isRead) {

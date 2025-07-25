@@ -30,12 +30,11 @@ export default function Home() {
 
   // Memoize event handlers to prevent child component re-renders
   const handleEmailSelect = useCallback((emailId: string) => {
-    // Use startTransition for non-urgent updates
-    startTransition(() => {
-      setSelectedEmailId(emailId);
-    });
-    // Mark email as read when opened (this is urgent)
+    // Mark email as read first (this is urgent and should happen immediately)
     emailActions.markAsRead(emailId);
+
+    // Then update selected email ID
+    setSelectedEmailId(emailId);
   }, [emailActions]);
 
   const handleBackToList = useCallback(() => {

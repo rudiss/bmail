@@ -60,7 +60,7 @@ const EmailList: React.FC<EmailListProps> = memo(({
   return (
     <div className="mr-[56px] mb-4 flex min-w-[500px] grow flex-col rounded-2xl bg-white">
       {/* Add top padding/spacing */}
-      <div className="pt-6">
+      <div className="pt-[48px]">
         <div className="divide-y divide-gray-200">
           {emails.map((email) => (
             <EmailItem

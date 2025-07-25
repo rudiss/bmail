@@ -32,13 +32,21 @@ export const useEmailActions = (initialEmails: Email[]): EmailActions => {
     setEmails(prevEmails => {
       // Early return if email doesn't exist or is already read
       const email = prevEmails.find(e => e.id === emailId);
-      if (!email || email.isRead) return prevEmails;
 
-      return prevEmails.map(email =>
+      if (!email) {
+        return prevEmails;
+      }
+
+      if (email.isRead) {
+        return prevEmails;
+      }
+
+      const updatedEmails = prevEmails.map(email =>
         email.id === emailId
           ? { ...email, isRead: true }
           : email
       );
+      return updatedEmails;
     });
   }, []);
 

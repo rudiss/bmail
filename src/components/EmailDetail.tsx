@@ -312,7 +312,7 @@ const EmailDetail: React.FC<EmailDetailProps> = ({
             </div>
 
             {/* Email body */}
-            <div className="mt-4 text-[14px] leading-relaxed">
+            <div className="ml-[52px] mt-4 text-[14px] leading-relaxed">
               {email.body}
             </div>
           </div>

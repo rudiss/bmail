@@ -69,6 +69,19 @@ export const initialEmails: Email[] = [
     folder: 'inbox'
   },
   {
+    id: '8',
+    sender: 'Deals4U',
+    senderEmail: 'no-reply@deals4u.biz',
+    subject: 'Free iPhone 15 - Act Now!',
+    preview: 'You\'ve been selected to receive a FREE iPhone 15! Just pay shipping. Limited time offer!!!',
+    body: 'You\'ve been selected to receive a FREE iPhone 15! Just pay shipping. Limited time offer!!!',
+    timestamp: 'Mar 12',
+    isStarred: false,
+    isRead: false,
+    avatar: 'D4',
+    folder: 'spam'
+  },
+  {
     id: '4',
     sender: 'StreamingService',
     senderEmail: 'account@streamingservice.com',
@@ -140,19 +153,7 @@ export const initialEmails: Email[] = [
     avatar: 'IT',
     folder: 'inbox'
   },
-  {
-    id: '8',
-    sender: 'Deals4U',
-    senderEmail: 'no-reply@deals4u.biz',
-    subject: 'Free iPhone 15 - Act Now!',
-    preview: 'You\'ve been selected to receive a FREE iPhone 15! Just pay shipping. Limited time offer!!!',
-    body: 'You\'ve been selected to receive a FREE iPhone 15! Just pay shipping. Limited time offer!!!',
-    timestamp: 'Mar 12',
-    isStarred: false,
-    isRead: false,
-    avatar: 'D4',
-    folder: 'spam'
-  },
+
   {
     id: '9',
     sender: 'Sam Parker, you',
@@ -174,7 +175,7 @@ let lastEmailsHash = '';
 
 // Helper function to create a simple hash of emails array
 function createEmailsHash(emails: Email[]): string {
-  return emails.map(e => `${e.id}-${e.folder}-${e.isDeleted}-${e.isStarred}`).join('|');
+  return emails.map(e => `${e.id}-${e.folder}-${e.isDeleted}-${e.isStarred}-${e.isRead}`).join('|');
 }
 
 export const getEmailsForFolder = (folderId: string, emails: Email[]): Email[] => {

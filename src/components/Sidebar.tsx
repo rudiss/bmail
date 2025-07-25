@@ -69,10 +69,6 @@ const Sidebar: React.FC<SidebarProps> = memo(({ activeFolder, onFolderSelect, em
           onClick={handleCompose}
           className="h-[56px] w-[138px] rounded-2xl bg-[rgb(194,231,255)] hover:bg-[rgb(174,211,235)] transition-colors flex items-center justify-center gap-3 px-6 shadow-sm"
         >
-          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-            <span className="text-white text-sm font-bold">✏</span>
-          </div>
-          <span className="text-gray-700 font-medium">Compose</span>
         </button>
       </div>
 
