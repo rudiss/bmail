@@ -44,7 +44,7 @@ const mockInitialEmails: Email[] = [
   }
 ]
 
-describe('useEmailActions', () => {
+describe('useEmailActions (useReducer)', () => {
   describe('Initial State', () => {
     it('initializes with provided emails', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
@@ -71,6 +71,9 @@ describe('useEmailActions', () => {
 
       const updatedEmail = result.current.emails.find(email => email.id === '1')
       expect(updatedEmail?.isStarred).toBe(true)
+      // Verify other properties remain unchanged
+      expect(updatedEmail?.isRead).toBe(false)
+      expect(updatedEmail?.folder).toBe('inbox')
     })
 
     it('unstars a starred email', () => {
@@ -82,21 +85,25 @@ describe('useEmailActions', () => {
 
       const updatedEmail = result.current.emails.find(email => email.id === '2')
       expect(updatedEmail?.isStarred).toBe(false)
+      // Verify other properties remain unchanged
+      expect(updatedEmail?.isRead).toBe(true)
+      expect(updatedEmail?.folder).toBe('inbox')
     })
 
     it('does nothing for non-existent email', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
 
       act(() => {
         result.current.toggleStar('non-existent')
       })
 
-      expect(result.current.emails).toEqual(mockInitialEmails)
+      expect(result.current.emails).toEqual(initialEmails)
     })
   })
 
   describe('markAsRead', () => {
-    it('marks unread email as read', () => {
+    it('marks an unread email as read', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
       act(() => {
@@ -105,32 +112,36 @@ describe('useEmailActions', () => {
 
       const updatedEmail = result.current.emails.find(email => email.id === '1')
       expect(updatedEmail?.isRead).toBe(true)
+      // Verify other properties remain unchanged
+      expect(updatedEmail?.isStarred).toBe(false)
+      expect(updatedEmail?.folder).toBe('inbox')
     })
 
-    it('does not change already read email', () => {
+    it('does nothing for already read email', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
 
       act(() => {
-        result.current.markAsRead('2')
+        result.current.markAsRead('2') // Already read
       })
 
-      const updatedEmail = result.current.emails.find(email => email.id === '2')
-      expect(updatedEmail?.isRead).toBe(true)
+      expect(result.current.emails).toEqual(initialEmails)
     })
 
     it('does nothing for non-existent email', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
 
       act(() => {
         result.current.markAsRead('non-existent')
       })
 
-      expect(result.current.emails).toEqual(mockInitialEmails)
+      expect(result.current.emails).toEqual(initialEmails)
     })
   })
 
   describe('markAsUnread', () => {
-    it('marks read email as unread', () => {
+    it('marks a read email as unread', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
       act(() => {
@@ -139,22 +150,36 @@ describe('useEmailActions', () => {
 
       const updatedEmail = result.current.emails.find(email => email.id === '2')
       expect(updatedEmail?.isRead).toBe(false)
+      // Verify other properties remain unchanged
+      expect(updatedEmail?.isStarred).toBe(true)
+      expect(updatedEmail?.folder).toBe('inbox')
     })
 
-    it('does not change already unread email', () => {
+    it('does nothing for already unread email', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
 
       act(() => {
-        result.current.markAsUnread('1')
+        result.current.markAsUnread('1') // Already unread
       })
 
-      const updatedEmail = result.current.emails.find(email => email.id === '1')
-      expect(updatedEmail?.isRead).toBe(false)
+      expect(result.current.emails).toEqual(initialEmails)
+    })
+
+    it('does nothing for non-existent email', () => {
+      const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
+
+      act(() => {
+        result.current.markAsUnread('non-existent')
+      })
+
+      expect(result.current.emails).toEqual(initialEmails)
     })
   })
 
   describe('moveToTrash', () => {
-    it('moves email to trash folder', () => {
+    it('moves an email to trash', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
       act(() => {
@@ -163,22 +188,44 @@ describe('useEmailActions', () => {
 
       const updatedEmail = result.current.emails.find(email => email.id === '1')
       expect(updatedEmail?.folder).toBe('trash')
+      expect(updatedEmail?.isDeleted).toBe(true)
+      // Verify other properties remain unchanged
+      expect(updatedEmail?.isStarred).toBe(false)
+      expect(updatedEmail?.isRead).toBe(false)
     })
 
-    it('sets isDeleted flag when moving to trash', () => {
+    it('does nothing for email already in trash', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
+      // First move to trash
       act(() => {
         result.current.moveToTrash('1')
       })
 
-      const updatedEmail = result.current.emails.find(email => email.id === '1')
-      expect(updatedEmail?.isDeleted).toBe(true)
+      const emailsAfterFirstMove = [...result.current.emails]
+
+      // Try to move to trash again
+      act(() => {
+        result.current.moveToTrash('1')
+      })
+
+      expect(result.current.emails).toEqual(emailsAfterFirstMove)
+    })
+
+    it('does nothing for non-existent email', () => {
+      const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
+
+      act(() => {
+        result.current.moveToTrash('non-existent')
+      })
+
+      expect(result.current.emails).toEqual(initialEmails)
     })
   })
 
   describe('moveToSpam', () => {
-    it('moves email to spam folder', () => {
+    it('moves an email to spam', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
       act(() => {
@@ -187,22 +234,37 @@ describe('useEmailActions', () => {
 
       const updatedEmail = result.current.emails.find(email => email.id === '1')
       expect(updatedEmail?.folder).toBe('spam')
+      expect(updatedEmail?.isDeleted).toBe(false)
+      // Verify other properties remain unchanged
+      expect(updatedEmail?.isStarred).toBe(false)
+      expect(updatedEmail?.isRead).toBe(false)
     })
 
-    it('does not affect emails already in spam', () => {
+    it('does nothing for email already in spam', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
 
       act(() => {
-        result.current.moveToSpam('3')
+        result.current.moveToSpam('3') // Already in spam
       })
 
-      const updatedEmail = result.current.emails.find(email => email.id === '3')
-      expect(updatedEmail?.folder).toBe('spam')
+      expect(result.current.emails).toEqual(initialEmails)
+    })
+
+    it('does nothing for non-existent email', () => {
+      const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
+
+      act(() => {
+        result.current.moveToSpam('non-existent')
+      })
+
+      expect(result.current.emails).toEqual(initialEmails)
     })
   })
 
   describe('restoreFromTrash', () => {
-    it('restores email from trash to inbox', () => {
+    it('restores an email from trash to inbox', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
       // First move to trash
@@ -215,40 +277,34 @@ describe('useEmailActions', () => {
         result.current.restoreFromTrash('1')
       })
 
-      const restoredEmail = result.current.emails.find(email => email.id === '1')
-      expect(restoredEmail?.folder).toBe('inbox')
-      expect(restoredEmail?.isDeleted).toBe(false)
+      const updatedEmail = result.current.emails.find(email => email.id === '1')
+      expect(updatedEmail?.folder).toBe('inbox')
+      expect(updatedEmail?.isDeleted).toBe(false)
+      // Verify other properties remain unchanged
+      expect(updatedEmail?.isStarred).toBe(false)
+      expect(updatedEmail?.isRead).toBe(false)
     })
 
-    it('restores email from spam to inbox', () => {
+    it('does nothing for email already in inbox and not deleted', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
 
       act(() => {
-        result.current.restoreFromTrash('3')
+        result.current.restoreFromTrash('1') // Already in inbox
       })
 
-      const restoredEmail = result.current.emails.find(email => email.id === '3')
-      expect(restoredEmail?.folder).toBe('inbox')
+      expect(result.current.emails).toEqual(initialEmails)
     })
 
-    it('clears isDeleted flag when restoring', () => {
-      // Create email with isDeleted true
-      const emailsWithDeleted = [
-        {
-          ...mockInitialEmails[0],
-          isDeleted: true,
-          folder: 'trash' as const
-        }
-      ]
-
-      const { result } = renderHook(() => useEmailActions(emailsWithDeleted))
+    it('does nothing for non-existent email', () => {
+      const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialEmails = [...result.current.emails]
 
       act(() => {
-        result.current.restoreFromTrash('1')
+        result.current.restoreFromTrash('non-existent')
       })
 
-      const restoredEmail = result.current.emails.find(email => email.id === '1')
-      expect(restoredEmail?.isDeleted).toBe(false)
+      expect(result.current.emails).toEqual(initialEmails)
     })
   })
 
@@ -290,36 +346,49 @@ describe('useEmailActions', () => {
       expect(result.current.emails.find(e => e.id === '2')?.isRead).toBe(true)
       expect(result.current.emails.find(e => e.id === '3')?.folder).toBe('trash')
     })
-  })
 
-  describe('Edge Cases', () => {
-    it('handles operations on non-existent emails gracefully', () => {
+    it('respects early returns in reducer for unchanged states', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
+      // Try operations that should not change state
       act(() => {
-        result.current.toggleStar('non-existent')
-        result.current.markAsRead('non-existent')
-        result.current.moveToTrash('non-existent')
-        result.current.moveToSpam('non-existent')
-        result.current.restoreFromTrash('non-existent')
+        result.current.markAsRead('2') // Already read
+        result.current.markAsUnread('1') // Already unread
+        result.current.moveToSpam('3') // Already in spam
       })
 
-      // Original emails should remain unchanged
+      // Should be exactly the same as initial state
       expect(result.current.emails).toEqual(mockInitialEmails)
     })
+  })
 
-    it('preserves email properties during folder changes', () => {
+  describe('Reducer Pattern Benefits', () => {
+    it('provides consistent action interface', () => {
       const { result } = renderHook(() => useEmailActions(mockInitialEmails))
 
+      // All actions follow the same pattern
+      expect(typeof result.current.toggleStar).toBe('function')
+      expect(typeof result.current.markAsRead).toBe('function')
+      expect(typeof result.current.markAsUnread).toBe('function')
+      expect(typeof result.current.moveToTrash).toBe('function')
+      expect(typeof result.current.moveToSpam).toBe('function')
+      expect(typeof result.current.restoreFromTrash).toBe('function')
+    })
+
+    it('maintains immutability', () => {
+      const { result } = renderHook(() => useEmailActions(mockInitialEmails))
+      const initialReference = result.current.emails
+
       act(() => {
-        result.current.moveToSpam('2')
+        result.current.markAsRead('1')
       })
 
-      const movedEmail = result.current.emails.find(email => email.id === '2')
-      expect(movedEmail?.sender).toBe('Jane Smith')
-      expect(movedEmail?.subject).toBe('Test Email 2')
-      expect(movedEmail?.isStarred).toBe(true) // Should preserve starred state
-      expect(movedEmail?.isRead).toBe(true) // Should preserve read state
+      // Should return a new array reference
+      expect(result.current.emails).not.toBe(initialReference)
+      // But unchanged emails should maintain their references
+      expect(result.current.emails.find(e => e.id === '2')).toBe(
+        initialReference.find(e => e.id === '2')
+      )
     })
   })
 }) 

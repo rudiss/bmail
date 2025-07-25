@@ -1,5 +1,92 @@
-import { useState, useCallback } from 'react';
+import { useReducer, useCallback } from 'react';
 import { Email } from '@/types/email';
+
+// Define all possible email actions with proper types
+interface EmailAction {
+  type: 'TOGGLE_STAR' | 'MARK_READ' | 'MARK_UNREAD' | 'MOVE_TO_TRASH' | 'MOVE_TO_SPAM' | 'RESTORE_FROM_TRASH';
+  payload: {
+    emailId: string;
+    folder?: string;
+  };
+}
+
+// Email reducer function to handle all state updates
+const emailReducer = (state: Email[], action: EmailAction): Email[] => {
+  const { type, payload } = action;
+  const { emailId } = payload;
+
+  switch (type) {
+    case 'TOGGLE_STAR':
+      return state.map(email =>
+        email.id === emailId
+          ? { ...email, isStarred: !email.isStarred }
+          : email
+      );
+
+    case 'MARK_READ': {
+      // Early return if email doesn't exist or is already read
+      const email = state.find(e => e.id === emailId);
+      if (!email || email.isRead) return state;
+
+      return state.map(email =>
+        email.id === emailId
+          ? { ...email, isRead: true }
+          : email
+      );
+    }
+
+    case 'MARK_UNREAD': {
+      // Early return if email doesn't exist or is already unread
+      const email = state.find(e => e.id === emailId);
+      if (!email || !email.isRead) return state;
+
+      return state.map(email =>
+        email.id === emailId
+          ? { ...email, isRead: false }
+          : email
+      );
+    }
+
+    case 'MOVE_TO_TRASH': {
+      // Early return if email doesn't exist or is already in trash
+      const email = state.find(e => e.id === emailId);
+      if (!email || email.folder === 'trash') return state;
+
+      return state.map(email =>
+        email.id === emailId
+          ? { ...email, folder: 'trash', isDeleted: true }
+          : email
+      );
+    }
+
+    case 'MOVE_TO_SPAM': {
+      // Early return if email doesn't exist or is already in spam
+      const email = state.find(e => e.id === emailId);
+      if (!email || email.folder === 'spam') return state;
+
+      return state.map(email =>
+        email.id === emailId
+          ? { ...email, folder: 'spam', isDeleted: false }
+          : email
+      );
+    }
+
+    case 'RESTORE_FROM_TRASH': {
+      // Early return if email doesn't exist or is already in inbox
+      const email = state.find(e => e.id === emailId);
+      if (!email || (email.folder === 'inbox' && !email.isDeleted)) return state;
+
+      return state.map(email =>
+        email.id === emailId
+          ? { ...email, folder: 'inbox', isDeleted: false }
+          : email
+      );
+    }
+
+    default:
+      return state;
+  }
+};
 
 export interface EmailActions {
   emails: Email[];
@@ -12,97 +99,48 @@ export interface EmailActions {
 }
 
 export const useEmailActions = (initialEmails: Email[]): EmailActions => {
-  const [emails, setEmails] = useState<Email[]>(initialEmails);
+  const [emails, dispatch] = useReducer(emailReducer, initialEmails);
 
+  // Action creators - these dispatch actions to the reducer
   const toggleStar = useCallback((emailId: string) => {
-    setEmails(prevEmails => {
-      // Early return if email doesn't exist
-      const emailExists = prevEmails.some(email => email.id === emailId);
-      if (!emailExists) return prevEmails;
-
-      return prevEmails.map(email =>
-        email.id === emailId
-          ? { ...email, isStarred: !email.isStarred }
-          : email
-      );
+    dispatch({
+      type: 'TOGGLE_STAR',
+      payload: { emailId }
     });
   }, []);
 
   const markAsRead = useCallback((emailId: string) => {
-    setEmails(prevEmails => {
-      // Early return if email doesn't exist or is already read
-      const email = prevEmails.find(e => e.id === emailId);
-
-      if (!email) {
-        return prevEmails;
-      }
-
-      if (email.isRead) {
-        return prevEmails;
-      }
-
-      const updatedEmails = prevEmails.map(email =>
-        email.id === emailId
-          ? { ...email, isRead: true }
-          : email
-      );
-      return updatedEmails;
+    dispatch({
+      type: 'MARK_READ',
+      payload: { emailId }
     });
   }, []);
 
   const markAsUnread = useCallback((emailId: string) => {
-    setEmails(prevEmails => {
-      // Early return if email doesn't exist or is already unread
-      const email = prevEmails.find(e => e.id === emailId);
-      if (!email || !email.isRead) return prevEmails;
-
-      return prevEmails.map(email =>
-        email.id === emailId
-          ? { ...email, isRead: false }
-          : email
-      );
+    dispatch({
+      type: 'MARK_UNREAD',
+      payload: { emailId }
     });
   }, []);
 
   const moveToTrash = useCallback((emailId: string) => {
-    setEmails(prevEmails => {
-      // Early return if email doesn't exist or is already in trash
-      const email = prevEmails.find(e => e.id === emailId);
-      if (!email || email.folder === 'trash') return prevEmails;
-
-      return prevEmails.map(email =>
-        email.id === emailId
-          ? { ...email, folder: 'trash', isDeleted: true }
-          : email
-      );
+    dispatch({
+      type: 'MOVE_TO_TRASH',
+      payload: { emailId }
     });
   }, []);
 
   const moveToSpam = useCallback((emailId: string) => {
-    setEmails(prevEmails => {
-      // Early return if email doesn't exist or is already in spam
-      const email = prevEmails.find(e => e.id === emailId);
-      if (!email || email.folder === 'spam') return prevEmails;
-
-      return prevEmails.map(email =>
-        email.id === emailId
-          ? { ...email, folder: 'spam', isDeleted: false }
-          : email
-      );
+    dispatch({
+      type: 'MOVE_TO_SPAM',
+      payload: { emailId }
     });
   }, []);
 
   const restoreFromTrash = useCallback((emailId: string) => {
-    setEmails(prevEmails => {
-      // Early return if email doesn't exist or is already in inbox
-      const email = prevEmails.find(e => e.id === emailId);
-      if (!email || (email.folder === 'inbox' && !email.isDeleted)) return prevEmails;
-
-      return prevEmails.map(email =>
-        email.id === emailId
-          ? { ...email, folder: 'inbox', isDeleted: false }
-          : email
-      );
+    dispatch({
+      type: 'RESTORE_FROM_TRASH',
+      payload: { emailId }
     });
   }, []);
 
