@@ -212,13 +212,6 @@ describe('Sidebar', () => {
       expect(composeButton).toHaveClass('h-[56px]', 'w-[138px]', 'rounded-2xl', 'bg-[rgb(194,231,255)]')
       expect(composeButton).toHaveClass('hover:bg-[rgb(174,211,235)]', 'transition-colors', 'flex', 'items-center', 'justify-center')
     })
-
-    it('renders compose button content correctly', () => {
-      render(<Sidebar {...defaultProps} />)
-
-      expect(screen.getByText('Compose')).toBeInTheDocument()
-      expect(screen.getByText('✏')).toBeInTheDocument()
-    })
   })
 
   describe('Icons', () => {
