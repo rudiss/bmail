@@ -86,8 +86,8 @@ const Sidebar: React.FC<SidebarProps> = memo(({ activeFolder, onFolderSelect, em
             key={folder.id}
             onClick={handleFolderSelect(folder.id)}
             className={`flex cursor-pointer items-center gap-4 rounded-full py-1.5 pr-3 pl-4 ${isActive
-                ? 'bg-[rgb(211,227,253)] font-semibold text-[rgb(32,33,36)]'
-                : 'hover:bg-[oklch(0.928_0.006_264.531)]'
+              ? 'bg-[rgb(211,227,253)] font-semibold text-[rgb(32,33,36)]'
+              : 'hover:bg-[oklch(0.928_0.006_264.531)]'
               }`}
           >
             {getIconForFolder(folder.id)}
