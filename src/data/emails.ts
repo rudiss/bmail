@@ -1,11 +1,12 @@
 import { Email, Folder } from '@/types/email';
 
 export const folders: Folder[] = [
-  { id: 'inbox', name: 'Inbox', count: 7, icon: '📥' },
-  { id: 'starred', name: 'Starred', count: 2, icon: '⭐' },
-  { id: 'all-mail', name: 'All Mail', count: 8, icon: '📧' },
+  { id: 'inbox', name: 'Inbox', count: 2, icon: '📥' },
+  { id: 'starred', name: 'Starred', count: 3, icon: '⭐' },
+  { id: 'all-mail', name: 'All Mail', count: 11, icon: '📧' },
   { id: 'spam', name: 'Spam', count: 1, icon: '⚠️' },
   { id: 'trash', name: 'Trash', count: 1, icon: '🗑️' },
+  { id: 'sent', name: 'Sent', count: 3, icon: '📤' },
 ];
 
 export const initialEmails: Email[] = [
@@ -166,6 +167,47 @@ export const initialEmails: Email[] = [
     isRead: true,
     avatar: 'SP',
     folder: 'trash'
+  },
+
+  // Sent emails
+  {
+    id: '10',
+    sender: 'You',
+    senderEmail: 'you@company.com',
+    subject: 'Meeting notes from today',
+    preview: 'Hi team, here are the key takeaways from today\'s meeting...',
+    body: 'Hi team,\n\nHere are the key takeaways from today\'s meeting:\n\n1. Q1 goals are on track\n2. New feature rollout scheduled for next month\n3. Team building event planned for Friday\n\nLet me know if you have any questions!\n\nBest regards,\nYou',
+    timestamp: 'Mar 13',
+    isStarred: false,
+    isRead: true,
+    avatar: 'YU',
+    folder: 'sent'
+  },
+  {
+    id: '11',
+    sender: 'You',
+    senderEmail: 'you@company.com',
+    subject: 'Re: Weekend hiking trip',
+    preview: 'Count me in! I\'ll bring snacks for the group.',
+    body: 'Hi Outdoor Club,\n\nCount me in for the weekend hiking trip! I\'ll bring snacks for the group and can help with carpooling if needed.\n\nLooking forward to it!\n\nCheers,\nYou',
+    timestamp: 'Mar 12',
+    isStarred: true,
+    isRead: true,
+    avatar: 'YU',
+    folder: 'sent'
+  },
+  {
+    id: '12',
+    sender: 'You',
+    senderEmail: 'you@company.com',
+    subject: 'Thank you for the interview',
+    preview: 'Thank you for taking the time to interview me yesterday...',
+    body: 'Dear Hiring Manager,\n\nThank you for taking the time to interview me yesterday for the Senior Developer position. I really enjoyed our conversation about the upcoming projects and team culture.\n\nI\'m very excited about the opportunity and look forward to hearing from you soon.\n\nBest regards,\nYou',
+    timestamp: 'Mar 11',
+    isStarred: false,
+    isRead: true,
+    avatar: 'YU',
+    folder: 'sent'
   }
 ];
 
@@ -210,6 +252,9 @@ export const getEmailsForFolder = (folderId: string, emails: Email[]): Email[] =
       break;
     case 'trash':
       result = emails.filter(email => email.folder === 'trash' || email.isDeleted);
+      break;
+    case 'sent':
+      result = emails.filter(email => email.folder === 'sent' && !email.isDeleted);
       break;
     default:
       result = emails.filter(email => email.folder === 'inbox' && !email.isDeleted);

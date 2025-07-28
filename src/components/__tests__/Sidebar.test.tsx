@@ -124,7 +124,7 @@ describe('Sidebar', () => {
       render(<Sidebar {...defaultProps} />)
 
       const inboxFolder = screen.getByText('Inbox').closest('div')
-      expect(inboxFolder).toHaveTextContent('2') // 2 inbox emails
+      expect(inboxFolder).toHaveTextContent('1') // 1 unread inbox email
     })
 
     it('shows count for spam when emails present', () => {
@@ -159,6 +159,49 @@ describe('Sidebar', () => {
 
       expect(inboxFolder?.textContent).toBe('Inbox')
       expect(spamFolder?.textContent).toBe('Spam')
+    })
+
+    it('shows unread count for inbox, not total count', () => {
+      const emailsWithMultipleUnread: Email[] = [
+        ...mockEmails,
+        {
+          id: '4',
+          sender: 'Third Sender',
+          senderEmail: 'third@example.com',
+          subject: 'Third Subject',
+          preview: 'Third preview',
+          body: 'Third body',
+          timestamp: '12:00 PM',
+          isStarred: false,
+          isRead: false, // unread
+          avatar: 'TS',
+          folder: 'inbox'
+        },
+        {
+          id: '5',
+          sender: 'Fourth Sender',
+          senderEmail: 'fourth@example.com',
+          subject: 'Fourth Subject',
+          preview: 'Fourth preview',
+          body: 'Fourth body',
+          timestamp: '1:00 PM',
+          isStarred: false,
+          isRead: true, // read
+          avatar: 'FS',
+          folder: 'inbox'
+        }
+      ]
+
+      const propsWithMultipleEmails = {
+        ...defaultProps,
+        emails: emailsWithMultipleUnread
+      }
+
+      render(<Sidebar {...propsWithMultipleEmails} />)
+
+      const inboxFolder = screen.getByText('Inbox').closest('div')
+      // Should show 2 (emails 2 and 4 are unread), not 4 (total inbox emails)
+      expect(inboxFolder).toHaveTextContent('2')
     })
   })
 

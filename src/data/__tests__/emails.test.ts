@@ -4,7 +4,7 @@ import { Email } from '@/types/email'
 describe('emails data utilities', () => {
   describe('folders', () => {
     it('contains all expected folders', () => {
-      const expectedFolderIds = ['inbox', 'starred', 'all-mail', 'spam', 'trash']
+      const expectedFolderIds = ['inbox', 'starred', 'all-mail', 'spam', 'trash', 'sent']
       const actualFolderIds = folders.map(folder => folder.id)
 
       expect(actualFolderIds).toEqual(expectedFolderIds)
@@ -25,7 +25,7 @@ describe('emails data utilities', () => {
     })
 
     it('has expected folder names', () => {
-      const expectedNames = ['Inbox', 'Starred', 'All Mail', 'Spam', 'Trash']
+      const expectedNames = ['Inbox', 'Starred', 'All Mail', 'Spam', 'Trash', 'Sent']
       const actualNames = folders.map(folder => folder.name)
 
       expect(actualNames).toEqual(expectedNames)
@@ -34,7 +34,7 @@ describe('emails data utilities', () => {
 
   describe('initialEmails', () => {
     it('contains expected number of emails', () => {
-      expect(initialEmails).toHaveLength(9)
+      expect(initialEmails).toHaveLength(12)
     })
 
     it('has proper email structure', () => {
@@ -250,6 +250,57 @@ describe('emails data utilities', () => {
         // Should include the email marked as deleted (id: '5') and trash folder email (id: '4')
         expect(result.find(email => email.id === '4')).toBeDefined()
         expect(result.find(email => email.id === '5')).toBeDefined()
+      })
+    })
+
+    describe('sent folder', () => {
+      it('returns only sent emails that are not deleted', () => {
+        const sentEmails = [
+          ...testEmails,
+          {
+            id: '6',
+            sender: 'You',
+            senderEmail: 'you@company.com',
+            subject: 'Sent Email',
+            preview: 'This is a sent email',
+            body: 'This is a sent email body',
+            timestamp: '2:30 PM',
+            isStarred: false,
+            isRead: true,
+            avatar: 'YU',
+            folder: 'sent' as const
+          }
+        ]
+
+        const result = getEmailsForFolder('sent', sentEmails)
+
+        expect(result).toHaveLength(1)
+        expect(result.every(email => email.folder === 'sent')).toBe(true)
+        expect(result.every(email => !email.isDeleted)).toBe(true)
+      })
+
+      it('excludes deleted sent emails', () => {
+        const sentEmails = [
+          ...testEmails,
+          {
+            id: '6',
+            sender: 'You',
+            senderEmail: 'you@company.com',
+            subject: 'Sent Email',
+            preview: 'This is a sent email',
+            body: 'This is a sent email body',
+            timestamp: '2:30 PM',
+            isStarred: false,
+            isRead: true,
+            avatar: 'YU',
+            folder: 'sent' as const,
+            isDeleted: true
+          }
+        ]
+
+        const result = getEmailsForFolder('sent', sentEmails)
+
+        expect(result).toHaveLength(0)
       })
     })
 

@@ -19,7 +19,7 @@ export interface Email {
   isStarred: boolean;
   isRead: boolean;
   avatar?: string;
-  folder: 'inbox' | 'spam' | 'trash';
+  folder: 'inbox' | 'spam' | 'trash' | 'sent';
   isDeleted?: boolean;
   thread?: EmailMessage[]; // For threaded conversations
 }
