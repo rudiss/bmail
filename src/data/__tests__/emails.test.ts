@@ -191,6 +191,58 @@ describe('emails data utilities', () => {
 
         expect(result.find(email => email.id === '5')).toBeUndefined()
       })
+
+      it('includes emails with starred thread messages', () => {
+        const emailsWithStarredThread = [
+          ...testEmails,
+          {
+            id: '6',
+            sender: 'Thread Sender',
+            senderEmail: 'thread@example.com',
+            subject: 'Thread Subject',
+            preview: 'Thread preview',
+            body: 'Thread body',
+            timestamp: '3:00 PM',
+            isStarred: false, // Main email is not starred
+            isRead: true,
+            avatar: 'TS',
+            folder: 'inbox' as const,
+            thread: [
+              {
+                id: '6-1',
+                sender: 'First Message',
+                senderEmail: 'first@example.com',
+                content: 'First message content',
+                timestamp: '2:00 PM',
+                avatar: 'FM',
+                recipients: 'to you',
+                isStarred: false
+              },
+              {
+                id: '6-2',
+                sender: 'Second Message',
+                senderEmail: 'second@example.com',
+                content: 'Second message content',
+                timestamp: '2:30 PM',
+                avatar: 'SM',
+                recipients: 'to you',
+                isStarred: true // This thread message is starred
+              }
+            ]
+          }
+        ]
+
+        const result = getEmailsForFolder('starred', emailsWithStarredThread)
+
+        // Should include the regular starred emails (2) plus the email with starred thread message (1)
+        expect(result).toHaveLength(3)
+
+        // Verify the threaded email is included even though main email is not starred
+        const threadedEmail = result.find(email => email.id === '6')
+        expect(threadedEmail).toBeDefined()
+        expect(threadedEmail?.isStarred).toBe(false) // Main email is not starred
+        expect(threadedEmail?.thread?.some(msg => msg.isStarred)).toBe(true) // But thread message is starred
+      })
     })
 
     describe('all-mail folder', () => {

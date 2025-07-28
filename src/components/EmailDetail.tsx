@@ -224,19 +224,19 @@ const EmailDetail: React.FC<EmailDetailProps> = ({
                           <div className="truncate text-xs whitespace-nowrap text-gray-500">
                             {message.timestamp}
                           </div>
-                          {/* Hide star button for emails in trash */}
+                          {/* Star button for individual thread messages */}
                           {activeFolder !== 'trash' && (
                             <button
                               className="-m-1 cursor-pointer rounded p-1 hover:bg-gray-100"
                               onClick={(e) => {
                                 e.stopPropagation(); // Prevent triggering the expand toggle
-                                onToggleStar(email.id, e);
+                                emailActions.toggleThreadMessageStar(email.id, message.id);
                               }}
-                              title={email.isStarred ? "Remove star" : "Add star"}
+                              title={(message.isStarred ?? false) ? "Remove star" : "Add star"}
                             >
                               <Image
                                 alt="Star"
-                                src={email.isStarred ? "/icon-star-filled-yellow.webp" : "/icon-star.webp"}
+                                src={(message.isStarred ?? false) ? "/icon-star-filled-yellow.webp" : "/icon-star.webp"}
                                 width={20}
                                 height={20}
                                 className="h-5 w-5"

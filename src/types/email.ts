@@ -6,6 +6,7 @@ export interface EmailMessage {
   timestamp: string;
   avatar: string;
   recipients?: string;
+  isStarred?: boolean; // Add support for starring individual thread messages
 }
 
 export interface Email {

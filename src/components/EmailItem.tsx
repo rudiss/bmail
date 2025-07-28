@@ -50,8 +50,12 @@ const EmailItem: React.FC<EmailItemProps> = memo(({
 
   // Memoize star icon path
   const starIconSrc = useMemo(() => {
-    return email.isStarred ? "/icon-star-filled-yellow.webp" : "/icon-star.webp";
-  }, [email.isStarred]);
+    if (email.thread?.some(message => message.isStarred) || email.isStarred) {
+      return "/icon-star-filled-yellow.webp"
+    }
+
+    return "/icon-star.webp"
+  }, [email.isStarred, email.thread]);
 
   // Memoize click handlers to prevent recreation on every render
   const handleEmailClick = useMemo(() => () => {

@@ -42,7 +42,8 @@ export const initialEmails: Email[] = [
         content: 'Hi team, just a reminder that our project deadline is this Friday. Please submit your final reports.',
         timestamp: 'Wed, Mar 13, 2:30 PM (24 hours ago)',
         avatar: 'LW',
-        recipients: 'to you, David Kim'
+        recipients: 'to you, David Kim',
+        isStarred: false
       },
       {
         id: '2-2',
@@ -51,7 +52,8 @@ export const initialEmails: Email[] = [
         content: 'Thanks Lisa! I\'ll have my section ready by Thursday afternoon.',
         timestamp: 'Wed, Mar 13, 4:20 PM (22 hours ago)',
         avatar: 'DK',
-        recipients: 'to Lisa Wang, you'
+        recipients: 'to Lisa Wang, you',
+        isStarred: false
       }
     ]
   },
@@ -127,7 +129,8 @@ export const initialEmails: Email[] = [
         content: 'Hey! It\'s been a while. Want to grab coffee this week and catch up?',
         timestamp: 'Tue, Mar 12, 11:45 AM (2 days ago)',
         avatar: 'ET',
-        recipients: 'to you'
+        recipients: 'to you',
+        isStarred: false
       },
       {
         id: '6-2',
@@ -136,7 +139,8 @@ export const initialEmails: Email[] = [
         content: 'Absolutely! I\'d love to catch up. How about Thursday afternoon around 3 PM? There\'s a nice new cafe on 5th Street called Brew & Beans.',
         timestamp: 'Tue, Mar 12, 2:20 PM (2 days ago)',
         avatar: 'YU',
-        recipients: 'to Emma Thompson'
+        recipients: 'to Emma Thompson',
+        isStarred: false
       }
     ]
   },
@@ -175,7 +179,17 @@ let lastEmailsHash = '';
 
 // Helper function to create a simple hash of emails array
 function createEmailsHash(emails: Email[]): string {
-  return emails.map(e => `${e.id}-${e.folder}-${e.isDeleted}-${e.isStarred}-${e.isRead}`).join('|');
+  return emails.map(e => {
+    let hash = `${e.id}-${e.folder}-${e.isDeleted}-${e.isStarred}-${e.isRead}`;
+
+    // Include thread message star states in hash
+    if (e.thread) {
+      const threadHash = e.thread.map(msg => `${msg.id}-${msg.isStarred ?? false}`).join(',');
+      hash += `-thread:${threadHash}`;
+    }
+
+    return hash;
+  }).join('|');
 }
 
 export const getEmailsForFolder = (folderId: string, emails: Email[]): Email[] => {
@@ -200,7 +214,16 @@ export const getEmailsForFolder = (folderId: string, emails: Email[]): Email[] =
       result = emails.filter(email => email.folder === 'inbox' && !email.isDeleted);
       break;
     case 'starred':
-      result = emails.filter(email => email.isStarred && !email.isDeleted && email.folder !== 'trash');
+      result = emails.filter(email => {
+        // Check if main email is starred
+        const mainEmailStarred = email.isStarred;
+
+        // Check if any thread message is starred
+        const threadMessageStarred = email.thread?.some(message => message.isStarred) ?? false;
+
+        // Show email if either main email or any thread message is starred
+        return (mainEmailStarred || threadMessageStarred) && !email.isDeleted && email.folder !== 'trash';
+      });
       break;
     case 'all-mail':
       result = emails.filter(email => !email.isDeleted && email.folder !== 'trash');

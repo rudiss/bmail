@@ -100,6 +100,74 @@ describe('useEmailActions (useReducer)', () => {
 
       expect(result.current.emails).toEqual(initialEmails)
     })
+
+    it('also stars first thread message when starring threaded email', () => {
+      const emailsWithThread: Email[] = [
+        {
+          id: '1',
+          sender: 'Thread Sender',
+          senderEmail: 'thread@example.com',
+          subject: 'Thread Subject',
+          preview: 'Thread preview',
+          body: 'Thread body',
+          timestamp: '10:00 AM',
+          isStarred: false,
+          isRead: true,
+          avatar: 'TS',
+          folder: 'inbox',
+          thread: [
+            {
+              id: '1-1',
+              sender: 'First Message',
+              senderEmail: 'first@example.com',
+              content: 'First message content',
+              timestamp: '9:00 AM',
+              avatar: 'FM',
+              recipients: 'to you',
+              isStarred: false
+            },
+            {
+              id: '1-2',
+              sender: 'Second Message',
+              senderEmail: 'second@example.com',
+              content: 'Second message content',
+              timestamp: '9:30 AM',
+              avatar: 'SM',
+              recipients: 'to you',
+              isStarred: false
+            }
+          ]
+        }
+      ]
+
+      const { result } = renderHook(() => useEmailActions(emailsWithThread))
+
+      // Star the threaded email
+      act(() => {
+        result.current.toggleStar('1')
+      })
+
+      const updatedEmail = result.current.emails.find(email => email.id === '1')
+
+      // Main email should be starred
+      expect(updatedEmail?.isStarred).toBe(true)
+
+      // First thread message should also be starred
+      expect(updatedEmail?.thread?.[0].isStarred).toBe(true)
+
+      // Second thread message should remain unstarred
+      expect(updatedEmail?.thread?.[1].isStarred).toBe(false)
+
+      // Now unstar the email - first thread message should also be unstarred
+      act(() => {
+        result.current.toggleStar('1')
+      })
+
+      const unstarredEmail = result.current.emails.find(email => email.id === '1')
+      expect(unstarredEmail?.isStarred).toBe(false)
+      expect(unstarredEmail?.thread?.[0].isStarred).toBe(false)
+      expect(unstarredEmail?.thread?.[1].isStarred).toBe(false)
+    })
   })
 
   describe('markAsRead', () => {

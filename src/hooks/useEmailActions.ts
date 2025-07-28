@@ -3,9 +3,10 @@ import { Email } from '@/types/email';
 
 // Define all possible email actions with proper types
 interface EmailAction {
-  type: 'TOGGLE_STAR' | 'MARK_READ' | 'MARK_UNREAD' | 'MOVE_TO_TRASH' | 'MOVE_TO_SPAM' | 'RESTORE_FROM_TRASH';
+  type: 'TOGGLE_STAR' | 'TOGGLE_THREAD_MESSAGE_STAR' | 'MARK_READ' | 'MARK_UNREAD' | 'MOVE_TO_TRASH' | 'MOVE_TO_SPAM' | 'RESTORE_FROM_TRASH';
   payload: {
     emailId: string;
+    messageId?: string; // For thread message actions
     folder?: string;
   };
 }
@@ -13,15 +14,50 @@ interface EmailAction {
 // Email reducer function to handle all state updates
 const emailReducer = (state: Email[], action: EmailAction): Email[] => {
   const { type, payload } = action;
-  const { emailId } = payload;
+  const { emailId, messageId } = payload;
 
   switch (type) {
     case 'TOGGLE_STAR':
-      return state.map(email =>
-        email.id === emailId
-          ? { ...email, isStarred: !email.isStarred }
-          : email
-      );
+      return state.map(email => {
+        if (email.id === emailId) {
+          const newStarredState = !email.isStarred;
+
+          // If email has a thread, also toggle the first thread message's star
+          if (email.thread && email.thread.length > 0) {
+            return {
+              ...email,
+              isStarred: newStarredState,
+              thread: email.thread.map((message, index) =>
+                index === 0 // First message in thread
+                  ? { ...message, isStarred: newStarredState }
+                  : message
+              )
+            };
+          }
+
+          // No thread, just toggle main email star
+          return { ...email, isStarred: newStarredState };
+        }
+        return email;
+      });
+
+    case 'TOGGLE_THREAD_MESSAGE_STAR': {
+      if (!messageId) return state; // Early return if no messageId provided
+
+      return state.map(email => {
+        if (email.id === emailId && email.thread) {
+          return {
+            ...email,
+            thread: email.thread.map(message =>
+              message.id === messageId
+                ? { ...message, isStarred: !message.isStarred }
+                : message
+            )
+          };
+        }
+        return email;
+      });
+    }
 
     case 'MARK_READ': {
       // Early return if email doesn't exist or is already read
@@ -91,6 +127,7 @@ const emailReducer = (state: Email[], action: EmailAction): Email[] => {
 export interface EmailActions {
   emails: Email[];
   toggleStar: (emailId: string) => void;
+  toggleThreadMessageStar: (emailId: string, messageId: string) => void; // New method for thread messages
   markAsRead: (emailId: string) => void;
   markAsUnread: (emailId: string) => void;
   moveToTrash: (emailId: string) => void;
@@ -106,6 +143,13 @@ export const useEmailActions = (initialEmails: Email[]): EmailActions => {
     dispatch({
       type: 'TOGGLE_STAR',
       payload: { emailId }
+    });
+  }, []);
+
+  const toggleThreadMessageStar = useCallback((emailId: string, messageId: string) => {
+    dispatch({
+      type: 'TOGGLE_THREAD_MESSAGE_STAR',
+      payload: { emailId, messageId }
     });
   }, []);
 
@@ -147,6 +191,7 @@ export const useEmailActions = (initialEmails: Email[]): EmailActions => {
   return {
     emails,
     toggleStar,
+    toggleThreadMessageStar,
     markAsRead,
     markAsUnread,
     moveToTrash,
