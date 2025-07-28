@@ -6,7 +6,7 @@ export const folders: Folder[] = [
   { id: 'all-mail', name: 'All Mail', count: 11, icon: '📧' },
   { id: 'spam', name: 'Spam', count: 1, icon: '⚠️' },
   { id: 'trash', name: 'Trash', count: 1, icon: '🗑️' },
-  { id: 'sent', name: 'Sent', count: 3, icon: '📤' },
+  // { id: 'sent', name: 'Sent', count: 3, icon: '📤' },
 ];
 
 export const initialEmails: Email[] = [
